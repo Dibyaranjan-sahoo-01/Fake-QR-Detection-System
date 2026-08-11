@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Scan #{{ scan.id }}{% endblock %}
+
+{% block content %}
+<section class="container-fluid px-4 py-5">
+  <div class="qs-eyebrow mb-2">SCAN RECORD #{{ scan.id }}</div>
+  <h1 class="mb-4">Scan Result</h1>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="qs-panel p-4 text-center">
+        {% set score = scan.risk_score %}
+        {% set cls = 'safe' if scan.scan_result == 'Safe' else ('suspicious' if scan.scan_result == 'Suspicious' else 'dangerous') %}
+        <div class="qs-result-verdict {{ cls }}">{{ scan.scan_result }}</div>
+        <div class="qs-mono qs-text-muted" style="font-size:1.4rem;">{{ score }} / 100</div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="qs-panel p-4">
+        <div class="qs-text-muted mb-1" style="font-size:.72rem;">DECODED CONTENT ({{ scan.qr_type }})</div>
+        <div class="qs-result-content-box">{{ scan.decoded_content }}</div>
+
+        <div class="qs-text-muted mb-2" style="font-size:.72rem;">DETECTION REASONS</div>
+        <ul class="qs-reason-list">
+          {% for reason in (scan.detection_reasons.split('; ') if scan.detection_reasons else []) %}
+          <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+
+        <div class="qs-divider my-3"></div>
+        <div class="row qs-mono" style="font-size:.82rem;">
+          <div class="col-6 qs-text-muted">Scanned</div><div class="col-6">{{ scan.scan_datetime.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+          <div class="col-6 qs-text-muted">Source</div><div class="col-6">{{ scan.source }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scanner.css') }}">
+{% endblock %}

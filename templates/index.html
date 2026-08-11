@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="qs-hero">
+  <div class="container-fluid px-4">
+    <div class="row align-items-center gy-5 py-5">
+      <div class="col-lg-6">
+        <div class="qs-eyebrow mb-3">// PHISHING-AWARE QR ANALYSIS</div>
+        <h1 class="qs-hero-title">Every QR code<br>hides a destination.<br><span class="qs-hero-title-accent">Know it before you tap.</span></h1>
+        <p class="qs-hero-sub">
+          QRSentry decodes QR codes from uploads or a live camera, inspects the
+          destination for phishing signals, and returns a 0–100 risk score with
+          a clear Safe, Suspicious, or Dangerous verdict — before you ever open the link.
+        </p>
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <a href="{{ url_for('main.scanner') }}" class="btn btn-qs-primary">Scan a QR code</a>
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-qs-outline">View dashboard</a>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="qs-scan-frame">
+          <div class="qs-scan-corner tl"></div>
+          <div class="qs-scan-corner tr"></div>
+          <div class="qs-scan-corner bl"></div>
+          <div class="qs-scan-corner br"></div>
+          <div class="qs-scan-beam"></div>
+          <div class="qs-scan-target qs-mono">
+            <div>DECODING…</div>
+            <div class="qs-scan-target-url">https://secure-login-update.xyz</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="qs-section">
+  <div class="container-fluid px-4">
+    <div class="qs-eyebrow mb-2">CAPABILITIES</div>
+    <h2 class="mb-4">What gets checked on every scan</h2>
+    <div class="row g-3">
+      {% set checks = [
+        ("HTTPS Verification", "Flags plain HTTP destinations that expose data in transit."),
+        ("Shortener Detection", "Identifies bit.ly, tinyurl and similar links hiding the real target."),
+        ("Raw IP Hosts", "Catches URLs pointing straight at an IP address instead of a domain."),
+        ("Keyword Heuristics", "Scans for login, verify, wallet, payment and other bait terms."),
+        ("Obfuscation Signals", "Looks for punycode, @ tricks, and other disguise patterns."),
+        ("Structural Risk", "Weighs URL length, subdomain count, and suspicious TLDs.")
+      ] %}
+      {% for title, desc in checks %}
+      <div class="col-md-4">
+        <div class="qs-panel qs-feature-card h-100">
+          <div class="qs-feature-mark">▹</div>
+          <h3 class="qs-feature-title">{{ title }}</h3>
+          <p class="qs-text-muted mb-0">{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="qs-section pb-5">
+  <div class="container-fluid px-4">
+    <div class="qs-panel qs-cta">
+      <div>
+        <div class="qs-eyebrow mb-2">READY WHEN YOU ARE</div>
+        <h2 class="mb-0">Upload an image or switch on your camera.</h2>
+      </div>
+      <a href="{{ url_for('main.scanner') }}" class="btn btn-qs-primary">Open scanner →</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.qs-hero-title { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.12; font-weight: 700; }
+.qs-hero-title-accent { color: var(--qs-cyan); }
+.qs-hero-sub { color: var(--qs-text-muted); font-size: 1.05rem; max-width: 46ch; margin-top: 1.25rem; }
+
+.qs-scan-frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  max-width: 420px;
+  margin: 0 auto;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(34,211,238,0.06), transparent 70%),
+    var(--qs-panel);
+  border: 1px solid var(--qs-panel-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.qs-scan-corner { position: absolute; width: 28px; height: 28px; border: 2px solid var(--qs-cyan); opacity: .8; }
+.qs-scan-corner.tl { top: 16px; left: 16px; border-right: none; border-bottom: none; }
+.qs-scan-corner.tr { top: 16px; right: 16px; border-left: none; border-bottom: none; }
+.qs-scan-corner.bl { bottom: 16px; left: 16px; border-right: none; border-top: none; }
+.qs-scan-corner.br { bottom: 16px; right: 16px; border-left: none; border-top: none; }
+
+.qs-scan-beam {
+  position: absolute;
+  left: 8%; right: 8%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--qs-cyan), transparent);
+  box-shadow: 0 0 12px 2px rgba(34,211,238,0.6);
+  animation: qs-sweep 2.6s ease-in-out infinite;
+}
+@keyframes qs-sweep {
+  0%, 100% { top: 12%; }
+  50% { top: 88%; }
+}
+
+.qs-scan-target {
+  position: absolute;
+  bottom: 18px; left: 18px; right: 18px;
+  background: rgba(10,14,20,0.75);
+  border: 1px solid var(--qs-panel-border);
+  border-radius: 8px;
+  padding: .6rem .8rem;
+  font-size: .74rem;
+  color: var(--qs-text-muted);
+}
+.qs-scan-target-url { color: var(--qs-red); margin-top: 2px; }
+
+.qs-section { padding-top: 3rem; }
+.qs-feature-card { padding: 1.5rem; }
+.qs-feature-mark { color: var(--qs-cyan); font-size: 1.1rem; margin-bottom: .5rem; }
+.qs-feature-title { font-size: 1.05rem; margin-bottom: .5rem; }
+
+.qs-cta { padding: 2.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+</style>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Scan History{% endblock %}
+
+{% block content %}
+<section class="container-fluid px-4 py-5">
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+    <div>
+      <div class="qs-eyebrow mb-2">SCAN LOG</div>
+      <h1 class="mb-0">Scan History</h1>
+    </div>
+    <a href="/api/export/csv" class="btn btn-qs-outline">Export CSV</a>
+  </div>
+
+  <div class="qs-panel p-3 mb-3">
+    <div class="row g-2">
+      <div class="col-md-5">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search decoded content or URL…">
+      </div>
+      <div class="col-md-3">
+        <select id="resultFilter" class="form-select">
+          <option value="">All results</option>
+          <option value="Safe">Safe</option>
+          <option value="Suspicious">Suspicious</option>
+          <option value="Dangerous">Dangerous</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="typeFilter" class="form-select">
+          <option value="">All types</option>
+          <option value="URL">URL</option>
+          <option value="TEXT">Text</option>
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button id="clearFiltersBtn" class="btn btn-qs-outline w-100">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qs-panel p-0">
+    <div class="table-responsive">
+      <table class="table qs-table mb-0">
+        <thead>
+          <tr>
+            <th>Time</th><th>Type</th><th>Content</th><th>Score</th><th>Result</th><th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="6" class="text-center py-4 qs-text-muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+<script>
+(function () {
+  "use strict";
+  const tbody = document.getElementById("historyTableBody");
+  const searchInput = document.getElementById("searchInput");
+  const resultFilter = document.getElementById("resultFilter");
+  const typeFilter = document.getElementById("typeFilter");
+  const clearBtn = document.getElementById("clearFiltersBtn");
+  let debounceTimer = null;
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str == null ? "" : String(str);
+    return div.innerHTML;
+  }
+
+  async function loadHistory() {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 qs-text-muted">Loading…</td></tr>`;
+    const params = new URLSearchParams();
+    if (searchInput.value.trim()) params.set("q", searchInput.value.trim());
+    if (resultFilter.value) params.set("result", resultFilter.value);
+    if (typeFilter.value) params.set("qr_type", typeFilter.value);
+
+    try {
+      const res = await fetch("/api/history?" + params.toString());
+      const data = await res.json();
+      if (!data.success || data.scans.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 qs-text-muted">No scans found.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.scans.map((s) => `
+        <tr>
+          <td class="qs-mono" style="font-size:.8rem;">${escapeHtml(s.scan_datetime)}</td>
+          <td>${escapeHtml(s.qr_type)}</td>
+          <td style="max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(s.decoded_content)}</td>
+          <td class="qs-mono">${s.risk_score}</td>
+          <td><span class="qs-badge qs-badge-${s.scan_result.toLowerCase()}">${escapeHtml(s.scan_result)}</span></td>
+          <td class="qs-text-muted">${escapeHtml(s.source)}</td>
+        </tr>
+      `).join("");
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 qs-text-muted">Failed to load history.</td></tr>`;
+    }
+  }
+
+  searchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadHistory, 350);
+  });
+  resultFilter.addEventListener("change", loadHistory);
+  typeFilter.addEventListener("change", loadHistory);
+  clearBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    resultFilter.value = "";
+    typeFilter.value = "";
+    loadHistory();
+  });
+
+  loadHistory();
+})();
+</script>
+{% endblock %}

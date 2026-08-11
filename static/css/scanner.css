@@ -1,0 +1,89 @@
+/* Scanner page — upload, webcam, and result panel styling */
+
+.qs-tabs { list-style: none; padding: 0; display: flex; gap: .5rem; border-bottom: 1px solid var(--qs-panel-border); }
+.qs-tab {
+  background: transparent;
+  border: none;
+  color: var(--qs-text-muted);
+  font-weight: 500;
+  padding: .7rem 1rem;
+  border-bottom: 2px solid transparent;
+  font-size: .92rem;
+  transition: color .15s ease, border-color .15s ease;
+}
+.qs-tab:hover { color: var(--qs-text); }
+.qs-tab.active { color: var(--qs-cyan); border-bottom-color: var(--qs-cyan); }
+
+.qs-dropzone {
+  border: 1.5px dashed var(--qs-panel-border);
+  border-radius: var(--qs-radius);
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+  transition: border-color .15s ease, background .15s ease;
+  cursor: pointer;
+}
+.qs-dropzone.qs-drag-over { border-color: var(--qs-cyan); background: rgba(34,211,238,0.04); }
+.qs-dropzone-icon { font-size: 1.6rem; color: var(--qs-cyan); margin-bottom: .5rem; }
+
+.qs-preview-img {
+  max-width: 100%;
+  max-height: 260px;
+  border-radius: var(--qs-radius-sm);
+  border: 1px solid var(--qs-panel-border);
+}
+
+.qs-webcam-video {
+  width: 100%;
+  max-height: 320px;
+  background: #000;
+  border-radius: var(--qs-radius-sm);
+  border: 1px solid var(--qs-panel-border);
+  object-fit: cover;
+}
+
+.qs-scan-idle-mark { font-size: 2rem; color: var(--qs-text-faint); margin-bottom: .75rem; }
+
+/* --- Result card --- */
+.qs-result-verdict {
+  font-family: var(--qs-font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: .5rem 0 1rem;
+}
+.qs-result-verdict.safe { color: var(--qs-green); }
+.qs-result-verdict.suspicious { color: var(--qs-amber); }
+.qs-result-verdict.dangerous { color: var(--qs-red); }
+
+.qs-gauge-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 1rem; }
+.qs-gauge-value {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  font-family: var(--qs-font-mono);
+}
+.qs-gauge-value .num { font-size: 1.7rem; font-weight: 600; }
+.qs-gauge-value .lbl { font-size: .68rem; color: var(--qs-text-muted); letter-spacing: .08em; }
+
+.qs-result-content-box {
+  background: var(--qs-bg-raised);
+  border: 1px solid var(--qs-panel-border);
+  border-radius: var(--qs-radius-sm);
+  padding: .7rem .9rem;
+  font-family: var(--qs-font-mono);
+  font-size: .84rem;
+  word-break: break-all;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.qs-reason-list { text-align: left; list-style: none; padding: 0; margin: 0; }
+.qs-reason-list li {
+  font-size: .86rem;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--qs-line);
+  color: var(--qs-text-muted);
+  display: flex;
+  gap: .5rem;
+}
+.qs-reason-list li:last-child { border-bottom: none; }
+.qs-reason-list li::before { content: '▹'; color: var(--qs-cyan); flex-shrink: 0; }

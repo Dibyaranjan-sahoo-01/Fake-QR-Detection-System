@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="container-fluid px-4 py-5">
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+    <div>
+      <div class="qs-eyebrow mb-2">SYSTEM OVERVIEW</div>
+      <h1 class="mb-0">Scan Dashboard</h1>
+    </div>
+    <a href="/api/export/csv" class="btn btn-qs-outline">Export CSV report</a>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card">
+        <div class="qs-stat-label">Total Scans</div>
+        <div class="qs-stat-value">{{ stats.total_scans }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card">
+        <div class="qs-stat-label">Safe</div>
+        <div class="qs-stat-value" style="color: var(--qs-green);">{{ stats.safe_count }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card">
+        <div class="qs-stat-label">Suspicious</div>
+        <div class="qs-stat-value" style="color: var(--qs-amber);">{{ stats.suspicious_count }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card">
+        <div class="qs-stat-label">Dangerous</div>
+        <div class="qs-stat-value" style="color: var(--qs-red);">{{ stats.dangerous_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="qs-panel p-4 h-100">
+        <h2 class="h5 mb-3">Risk Distribution</h2>
+        <canvas id="riskChart" height="220"
+          data-buckets='{{ stats.risk_distribution | tojson }}'></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="qs-panel p-4 h-100">
+        <h2 class="h5 mb-3">Recent Activity</h2>
+        {% if stats.recent_activity %}
+        <div class="table-responsive">
+          <table class="table qs-table mb-0">
+            <thead><tr><th>Time</th><th>Type</th><th>Content</th><th>Score</th><th>Result</th></tr></thead>
+            <tbody>
+              {% for scan in stats.recent_activity %}
+              <tr>
+                <td class="qs-mono" style="font-size:.8rem;">{{ scan.scan_datetime }}</td>
+                <td>{{ scan.qr_type }}</td>
+                <td style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ scan.decoded_content }}</td>
+                <td class="qs-mono">{{ scan.risk_score }}</td>
+                <td>
+                  <span class="qs-badge qs-badge-{{ scan.scan_result|lower }}">{{ scan.scan_result }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="qs-text-muted mb-0">No scans yet. Head to the scanner to get started.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

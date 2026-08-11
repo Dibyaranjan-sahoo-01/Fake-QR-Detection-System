@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Error {{ code }}{% endblock %}
+
+{% block content %}
+<section class="container-fluid px-4 py-5 d-flex justify-content-center">
+  <div class="text-center" style="max-width: 480px;">
+    <div class="qs-eyebrow mb-2">ERROR {{ code }}</div>
+    <h1 class="mb-3">{{ message }}</h1>
+    <a href="{{ url_for('main.index') }}" class="btn btn-qs-primary">Return home</a>
+  </div>
+</section>
+{% endblock %}

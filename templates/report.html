@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Report{% endblock %}
+
+{% block content %}
+<section class="container-fluid px-4 py-5">
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+    <div>
+      <div class="qs-eyebrow mb-2">SUMMARY REPORT</div>
+      <h1 class="mb-0">QRSentry Scan Report</h1>
+      <p class="qs-text-muted mt-2">Generated {{ stats.recent_activity[0].scan_datetime if stats.recent_activity else 'N/A' }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button onclick="window.print()" class="btn btn-qs-outline">Print</button>
+      <a href="/api/export/csv" class="btn btn-qs-primary">Export CSV</a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card"><div class="qs-stat-label">Total Scans</div><div class="qs-stat-value">{{ stats.total_scans }}</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card"><div class="qs-stat-label">Safe</div><div class="qs-stat-value" style="color:var(--qs-green);">{{ stats.safe_count }}</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card"><div class="qs-stat-label">Suspicious</div><div class="qs-stat-value" style="color:var(--qs-amber);">{{ stats.suspicious_count }}</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="qs-panel qs-stat-card"><div class="qs-stat-label">Dangerous</div><div class="qs-stat-value" style="color:var(--qs-red);">{{ stats.dangerous_count }}</div></div>
+    </div>
+  </div>
+
+  <div class="qs-panel p-0">
+    <div class="table-responsive">
+      <table class="table qs-table mb-0">
+        <thead><tr><th>Time</th><th>Type</th><th>Content</th><th>Score</th><th>Result</th></tr></thead>
+        <tbody>
+          {% for scan in stats.recent_activity %}
+          <tr>
+            <td class="qs-mono" style="font-size:.8rem;">{{ scan.scan_datetime }}</td>
+            <td>{{ scan.qr_type }}</td>
+            <td>{{ scan.decoded_content }}</td>
+            <td class="qs-mono">{{ scan.risk_score }}</td>
+            <td><span class="qs-badge qs-badge-{{ scan.scan_result|lower }}">{{ scan.scan_result }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center py-4 qs-text-muted">No scan data yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>@media print { .qs-nav, .qs-footer, button, a.btn { display: none !important; } }</style>
+{% endblock %}
